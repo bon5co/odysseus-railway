@@ -1,15 +1,19 @@
-# odysseus-railway-searxng
+# odysseus-railway
 
-SearXNG sidecar image for the [Odysseus](https://github.com/pewdiepie-archdaemon/odysseus)
-Railway template. Published as `ghcr.io/bon5co/odysseus-railway-searxng:latest`.
+Wrapper image for the [Odysseus](https://github.com/pewdiepie-archdaemon/odysseus)
+Railway template. Built `FROM` the **official** upstream image, pinned by digest.
 
-Odysseus calls SearXNG with `format=json`
-(`services/search/providers.py`). The stock SearXNG image ships
-`search.formats: [html]` only, so an unmodified image answers **HTTP 403** to
-every Odysseus web search and Deep Research call while the container itself
-stays healthy. This image installs the settings file upstream Odysseus ships
-for exactly that reason, with `server.secret_key` taken from `SEARXNG_SECRET`
-at boot instead of being baked into a public image layer.
+Published as `ghcr.io/bon5co/odysseus-railway:latest`.
 
-Pinned to `searxng/searxng:2026.5.31-7159b8aed` — the tag upstream Odysseus
-pins in its own `docker-compose.yml`.
+What it adds, and why:
+
+| Change | Reason |
+|---|---|
+| `CMD` execs uvicorn on `$PORT` | Railway's HTTP healthcheck dials the **injected** port, not the domain's target port. Upstream's `--port 7000` is fixed, so a healthchecked service never goes healthy. |
+| Railway-constant settings baked as `ENV` | `templateGenerate` drops a template variable whose default is a literal and republishes it as *required, no value* — every one of them becomes a blank field on the deploy form. |
+| `@playwright/mcp` warmed into the npx cache | Upstream installs it over the network on first start. On Railway that cache is on the ephemeral layer, so the download repeats on every deploy and the Built-in: Browser MCP server is missing until it completes. |
+
+The upstream `ENTRYPOINT` is deliberately preserved: it repairs ownership of
+`/app/data` (Railway mounts volumes as uid 0) and runs `setup.py` before
+dropping privileges with `gosu`. A Railway **start command** would replace it
+outright and skip all of that, which is why the port fix is a `CMD` here.
