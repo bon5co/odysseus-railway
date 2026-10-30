@@ -1,5 +1,9 @@
 # odysseus-railway
 
+[![Deploy on Railway](https://railway.com/button.svg)](https://railway.com/deploy/odysseus-v102-or-pewdiepie-ai-workspace-?referralCode=Z1xivh&utm_medium=integration&utm_source=template&utm_campaign=generic)
+
+**Deploy on Railway:** [Odysseus template](https://railway.com/deploy/odysseus-v102-or-pewdiepie-ai-workspace-?referralCode=Z1xivh&utm_medium=integration&utm_source=template&utm_campaign=generic)
+
 Wrapper image for the [Odysseus](https://github.com/pewdiepie-archdaemon/odysseus)
 Railway template. Built `FROM` the **official** upstream image, pinned by digest.
 
